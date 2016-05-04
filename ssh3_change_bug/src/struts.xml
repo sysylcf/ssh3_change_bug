@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+
+    <constant name="struts.devMode" value="false" />
+    <constant name="struts.multipart.saveDir" value="/tmp"/>
+    
+    <!--转编码 解决乱码  -->
+       <!--  <constant name="struts.i18n.encoding" value="ISO8859-1"></constant>  --> 
+
+	<package name="shop" extends="struts-default" namespace="/">
+	
+   
+	 
+	 <!--后台权限拦截器  -->
+	<interceptors>
+	 <!-- <interceptor-stack name="myStack">   
+       		 <interceptor-ref name="token"/>   
+       		 <interceptor-ref name="token-session"/>   
+   		 <interceptor-ref name="defaultStack" />                
+   	 </interceptor-stack> --> 
+	
+	<interceptor name="PrivilegeInterceptor" class="com.lcf.shop.interceptor.PrivilegeInterceptor"/>
+	 <interceptor-stack name="PrivilegeInterceptors">
+	 <interceptor-ref name="defaultStack"/>
+	<interceptor-ref name="PrivilegeInterceptor">
+	<param name="excludeMethods">isLogin,logout,top,left,login,quit,index</param>
+	</interceptor-ref> 
+	
+	<!--  配置不被拦截的方法   -->
+           <!--  <param name="excludeMethods">isLogin,logout,top,left,login</param> -->
+	</interceptor-stack>  
+	</interceptors>
+	
+	<!-- <default-interceptor-ref name="PrivilegeInterceptors"/> -->
+	
+		<global-results>
+			<result name="msg">/WEB-INF/jsp/msg.jsp</result>
+			<result name="login">/WEB-INF/Back/index.jsp</result>
+		</global-results>
+	
+		<!-- 配置首页访问的Action -->
+		<action name="index" class="indexAction">
+			<result name="index">/WEB-INF/jsp/index.jsp</result>
+		</action>
+		
+		<!-- 配置测试Action -->
+		<action name="test_*" class="testAction" method="{1}">
+			<result>/WEB-INF/Back/index.jsp</result>
+			<result name="top">/WEB-INF/Back/top.jsp</result>
+			<result name="left">/WEB-INF/Back/left.jsp</result>
+			<result name="bottom">/WEB-INF/Back/bottom.jsp</result>
+			<result name="welcome">/WEB-INF/Back/welcome.jsp</result> 
+			<result name="ajax"> /WEB-INF/Ajax/Ajax.jsp</result>
+			<!-- <result name="testwelcome">/WEB-INF/Back/testwelcome.jsp</result> -->
+			<result name="testwelcome">/WEB-INF/Back/category/list.jsp</result>
+			<result name="add_jump">/WEB-INF/Back/category/add.jsp </result>
+			<!--  <interceptor-ref name="PrivilegeInterceptors">
+		          </interceptor-ref> -->
+		</action>
+		
+		<!-- 配置用户模块的Action -->
+		<action name="user_*" class="userAction" method="{1}">
+			<result name="registPage">/WEB-INF/jsp/regist.jsp</result>
+			<result name="input">/WEB-INF/jsp/regist.jsp</result>
+			<result name="loginPage">/WEB-INF/jsp/login.jsp</result>
+			<result name="login">/WEB-INF/jsp/login.jsp</result>
+			<result name="loginSuccess" type="redirectAction">index</result>
+			<result name="quit" type="redirectAction">index</result>
+			<result name="checkcodeFail">/WEB-INF/jsp/regist.jsp</result>
+		</action>
+		
+		<!-- 验证码Action -->
+		<action name="checkImg" class="checkImgAction"></action>
+		
+		<!-- 商品模块的Action -->
+		<action name="product_*" class="productAction" method="{1}">
+			<result name="findByPid">/WEB-INF/jsp/product.jsp</result>
+			<result name="findByCid">/WEB-INF/jsp/productList.jsp</result>
+			<result name="findByCsid">/WEB-INF/jsp/productList.jsp</result>
+		</action>
+		
+		<!-- 购物车的Action -->
+		<action name="cart_*" class="cartAction" method="{1}">
+			<result name="addCart">/WEB-INF/jsp/cart.jsp</result>
+			<result name="clearCart">/WEB-INF/jsp/cart.jsp</result>
+			<result name="removeCart">/WEB-INF/jsp/cart.jsp</result>
+			<result name="myCart">/WEB-INF/jsp/cart.jsp</result>
+		</action>
+		
+		
+		<!-- 订单的Action -->
+		<action name="order_*" class="orderAction" method="{1}">
+			<result name="saveOrder">/WEB-INF/jsp/order.jsp</result>
+			<result name="findByUid">/WEB-INF/jsp/orderList.jsp</result>
+			<result name="findByOid">/WEB-INF/jsp/order.jsp</result>
+			<result name="updateStateSuccess" type="redirectAction">order_findByUid.action?page=1</result>
+		</action>
+		
+		
+		<!--配置后台登陆的action  -->
+		
+		<action name="adminuser_*" class="adminUserAction" method="{1}">
+		<result name="loginFail">/WEB-INF/Back/index.jsp</result>
+		<result name="loginSuccess"> /WEB-INF/Back/home.jsp</result>
+		<result name="adminIndex">/WEB-INF/Back/index.jsp </result>
+		<result name="edit">/WEB-INF/Back/adminuser/edit.jsp </result>
+		<result name="quit">adminuser.action</result>
+		<interceptor-ref name="PrivilegeInterceptors">
+		<!-- <param name="includeMethods">edit</param> -->
+		<!-- <param name="excludeMethods">login</param> -->
+		</interceptor-ref>
+		 
+		</action>
+		<!--配置后台一级分类获取action  -->
+		
+		<action name="adminCategory_*" class="adminCategoryAction" method="{1}">
+		
+		<!--  配置token拦截器 -->
+		
+	          <interceptor-ref name="tokenSession" >
+	          <param name="includeMethods">save</param>
+	         <!--  <param name="excludeMethods">save,update,save.action</param> -->
+	          </interceptor-ref>
+	           <interceptor-ref name="defaultStack"/>
+	           <result >/WEB-INF/jsp/msg.jsp</result>
+		
+		
+		
+		<!-- <result name="findAll">/WEB-INF/Back/categorysecond/list1.jsp</result> -->
+		<result name="findCategory">/WEB-INF/Back/categorysecond/list.jsp</result>
+		<result name="findAllByOne">/WEB-INF/Back/category/list.jsp</result>
+		<result name="findAll">/WEB-INF/Back/categorysecond/list_top.jsp</result>
+		<result name="findAllSecond">/WEB-INF/Back/categorysecond/list.jsp</result>
+		<!-- <result name="welcome">/WEB-INF/Back/welcome.jsp </result> -->
+		<result name="add_jump">/WEB-INF/Back/category/add.jsp </result>
+		<result name="edit">/WEB-INF/Back/category/edit.jsp </result>
+		
+		<!-- <interceptor-ref name="PrivilegeInterceptor"></interceptor-ref>
+		<interceptor-ref name="defaultStack"></interceptor-ref> -->
+		
+		
+		</action>
+		
+		<!--配置后台二级分类获取action  -->
+		
+		<action name="adminCategorySecond_*" class="adminCategorySecondAction" method="{1}">
+		<result name="findByCid">/WEB-INF/Back/categorysecond/list.jsp</result>
+		<!-- <result name="findSecond">/WEB-INF/Back/categorysecond/list1.jsp</result> -->
+		<result name="findSecond">/WEB-INF/Back/categorysecond/list.jsp</result>
+		<result name="findAll">/WEB-INF/Back/categorysecond/list_top.jsp</result>
+		<result name="add_jump">/WEB-INF/Back/categorysecond/add.jsp</result>
+		<result name="edit">/WEB-INF/Back/categorysecond/edit.jsp </result>
+		<!-- <result name="saveSuccess">/WEB-INF/Back/categorysecond/list_index.jsp</result> -->
+		<result name="test1">/WEB-INF/Back/categorysecond/test1.jsp</result>
+		<result name="listIndex">/WEB-INF/Back/categorysecond/list_index.jsp</result>
+		<!-- <interceptor-ref name="PrivilegeInterceptors">
+		<param name="includeMethods">edit</param>
+		</interceptor-ref> -->
+		<!-- <interceptor-ref name="PrivilegeInterceptor"/>
+		       <interceptor-ref name="defaultStack"/> -->
+		          
+		</action>
+		
+		
+		<!-- 后台product 管理 action  -->
+		<action name="adminProduct_*" class="adminProductAction" method="{1}">
+		<result name ="index">/WEB-INF/Back/product/index.jsp</result>
+		<result name ="indexTop">/WEB-INF/Back/product/index_top.jsp</result>
+		<result name ="productList">/WEB-INF/Back/product/list.jsp </result>
+		<result name ="edit">/WEB-INF/Back/product/edit.jsp </result>
+		<result name ="add_jump">/WEB-INF/Back/product/add.jsp</result>	
+		
+			<result name="findAll">/admin/product/list.jsp</result>
+			<result name="addPageSuccess">/admin/product/add.jsp</result>
+			<result name="saveSuccess" type="redirectAction">adminProduct_findAll.action?page=1</result>
+			<result name="deleteSuccess" type="redirectAction">adminProduct_findAll.action?page=1</result>
+			<result name="editSuccess">/admin/product/edit.jsp</result>
+			<result name="updateSuccess" type="redirectAction">adminProduct_findAll.action?page=1</result>
+		</action>
+		
+		<!-- 后台用户Action -->
+		<action name="userAdmin_*" class="userAdminAction" method="{1}">
+			<!-- <result name="findAll">/admin/user/list.jsp</result> -->
+			<result name="show">/WEB-INF/Back/user/show.jsp</result>
+			<result name="findAll">/WEB-INF/Back/user/list.jsp</result>
+			<result name="deleteSuccess" type="redirectAction">userAdmin_findAll.action?page=1</result>
+			<result name="editSuccess">/WEB-INF/Back/user/edit.jsp</result>
+			<result name="updateSuccess" type="redirectAction">userAdmin_findAll.action?page=1</result>
+			<!-- <interceptor-ref name="privilegeInterceptor"/>
+			<interceptor-ref name="defaultStack"/> -->
+		</action>
+		
+		<!-- 后台订单管理Action -->
+		<action name="adminOrder_*" class="adminOrderAction" method="{1}">
+			<result name="findAll">/WEB-INF/Back/order/list.jsp</result>
+			<result name="findAllbyState">/WEB-INF/Back/order/listbyState.jsp</result>
+			<result name="updateStateSuccess" type="redirectAction">adminOrder_findAll.action?page=1</result>
+			<result name="findOrderItem" >/WEB-INF/Back/order/orderItem.jsp</result>
+			<!-- <interceptor-ref name="privilegeInterceptor"/>
+			<interceptor-ref name="defaultStack"/> -->
+		</action>
+	</package>
+	
+	
+	
+</struts>
